@@ -10,6 +10,8 @@ import com.example.tddprac.repository.MembershipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,10 +19,11 @@ import java.util.stream.Collectors;
 @Service
 public class MembershipService {
     private final MembershipRepository membershipRepository;
-
+    private final PointService pointService;
     @Autowired
-    public MembershipService(MembershipRepository membershipRepository) {
+    public MembershipService(MembershipRepository membershipRepository, PointService pointService) {
         this.membershipRepository = membershipRepository;
+        this.pointService = pointService;
     }
 
     public MembershipAddResponse addMembership(final String userId, final MembershipType membershipType, final Integer point){
@@ -68,5 +71,28 @@ public class MembershipService {
                 .point(membership.getPoint())
                 .createdAt(membership.getCreatedAt())
                 .build();
+    }
+
+    public void removeMembership(final Long membershipId, final String userId) {
+        final Optional<Membership> optionalMembership = membershipRepository.findById(membershipId);
+        final Membership membership = optionalMembership.orElseThrow(()-> new MembershipException(MembershipErrorResult.MEMBERSHIP_NOT_FOUND));
+        if(!membership.getUserId().equals(userId)){
+            throw new MembershipException(MembershipErrorResult.NOT_MEMBERSHIP_OWNER);
+        }
+
+        membershipRepository.deleteById(membershipId);
+    }
+
+    @Transactional
+    public void accumulateMembershipPoint(final Long membershipId, final String userId, final int amount) {
+        final Optional<Membership> optionalMembership = membershipRepository.findById(membershipId);
+        final Membership membership = optionalMembership.orElseThrow(() -> new MembershipException(MembershipErrorResult.MEMBERSHIP_NOT_FOUND));
+        if (!membership.getUserId().equals(userId)) {
+            throw new MembershipException(MembershipErrorResult.NOT_MEMBERSHIP_OWNER);
+        }
+
+        final int additionalAmount = pointService.calculateAmount(amount);
+
+        membership.setPoint(additionalAmount + membership.getPoint());
     }
 }

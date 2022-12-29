@@ -8,7 +8,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Getter
 @RequiredArgsConstructor
 public enum MembershipErrorResult {
-    NOT_MEMBERSHIP_OWNER(HttpStatus.FORBIDDEN,"Not Membership Owner"),
+    NOT_MEMBERSHIP_OWNER(HttpStatus.BAD_REQUEST,"Not a Membership Owner"),
     MEMBERSHIP_NOT_FOUND(HttpStatus.NOT_FOUND, "Membership Not found"),
     DUPLICATED_MEMBERSHIP_REGISTER(HttpStatus.BAD_REQUEST, "Duplicated Membership Register Request"),
     UNKNOWN_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown Exception"),

@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table
 @Getter
-@Setter
 @Builder
 // 모든 필드 값을 파라미터로 하는 생성자 자동생성
 @AllArgsConstructor
@@ -30,6 +29,7 @@ public class Membership {
     @Column(nullable = false, length = 20)
     private MembershipType membershipType;
 
+    @Setter
     @Column(nullable = false)
     @ColumnDefault("0")
     private Integer point;
